@@ -1,5 +1,10 @@
 <?php
 session_start();
+if(isset($_SESSION['adminLoggedIn']) || isset($_SESSION['adminLoggedIn']) == true){
+    header('Location: ratnews/category/dashboard.php');
+    exit;
+}
+
 
 // Connection to database
 require 'config/connection.php';
@@ -57,7 +62,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit'])) {
         $_SESSION['adminUsername'] = $user['user_name'];
 
         // Redirected to Admin Dashboard 
-        header('Location: ratnews/dashboard.php');
+        header('Location: ratnews/category/dashboard.php');
         exit;
     } catch (Exception $e) {
         $_SESSION['errors'][] = 'Admin Login Error ' . $e->getMessage();
@@ -119,7 +124,7 @@ $_SESSION['errors'] = [];
                                         <i class="bi bi-person-fill text-muted"></i>
                                     </span>
                                     <input type="text" class="form-control border-start-0 ps-0" id="username"
-                                        name="username" placeholder="Enter your username">
+                                        name="username" placeholder="Enter your username" autofocus>
                                 </div>
                             </div>
 
@@ -141,7 +146,7 @@ $_SESSION['errors'] = [];
                                         Remember Me
                                     </label>
                                 </div>
-                                <a href="forgot-password.html" class="text-primary text-decoration-none small">Forgot
+                                <a href="#" class="text-primary text-decoration-none small">Forgot
                                     Password?</a>
                             </div>
 

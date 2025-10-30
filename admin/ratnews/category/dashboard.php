@@ -1,4 +1,16 @@
-<?php require '../layout/header.php'; ?>
+<?php
+session_start();
+if (!isset($_SESSION['adminLoggedIn']) || $_SESSION['adminLoggedIn'] !== true) {
+    $_SESSION['errors'][] = 'Please Login First';
+    header('Location: ../index.php');
+    exit;
+}
+
+
+require '../layout/header.php';
+
+
+?>
 <!--start content-->
 <main class="page-content">
 
