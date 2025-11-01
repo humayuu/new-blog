@@ -130,6 +130,17 @@
                         </li>
                     </ul>
                 </li>
+                <li>
+                    <a class="has-arrow" href="javascript:;">
+                        <div class="parent-icon"><i class="bi bi-people-fill"></i>
+                        </div>
+                        <div class="menu-title">Manage Admin User</div>
+                    </a>
+                    <ul>
+                        <li> <a href="../admin_users/all_admin_user.php"><i class="bi bi-circle"></i>All Admin User</a>
+                        </li>
+                    </ul>
+                </li>
             </ul>
             <!--end navigation-->
         </aside>
