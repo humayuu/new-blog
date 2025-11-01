@@ -155,12 +155,14 @@ require '../layout/header.php'
                                             <td><?= htmlspecialchars($category['no_of_post']) ?></td>
                                             <td>
                                                 <div class="d-flex align-items-center gap-3 fs-6">
-                                                    <a href="javascript:;" class="text-warning" data-bs-toggle="tooltip"
+                                                    <a href="edit_category.php?id=<?= htmlspecialchars($category['id']) ?>"
+                                                        class="text-warning" data-bs-toggle="tooltip"
                                                         data-bs-placement="bottom" title=""
                                                         data-bs-original-title="Edit info" aria-label="Edit"><i
                                                             class="bi bi-pencil-fill"></i></a>
-                                                    <a href="javascript:;" class="text-danger" data-bs-toggle="tooltip"
-                                                        data-bs-placement="bottom" title=""
+                                                    <a href="delete_category.php?id=<?= htmlspecialchars($category['id']) ?>"
+                                                        class="text-danger" onclick="return confirm('Are you Sure?')"
+                                                        data-bs-toggle="tooltip" data-bs-placement="bottom" title=""
                                                         data-bs-original-title="Delete" aria-label="Delete"><i
                                                             class="bi bi-trash-fill"></i></a>
                                                 </div>
