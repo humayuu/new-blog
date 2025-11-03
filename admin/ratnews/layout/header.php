@@ -118,7 +118,6 @@
                     </a>
                 </li>
 
-                <li class="menu-label">Manage Post</li>
                 <li>
                     <a class="has-arrow" href="javascript:;">
                         <div class="parent-icon"><i class="bi bi-bookmark-fill"></i>
@@ -130,6 +129,32 @@
                         </li>
                     </ul>
                 </li>
+
+                <li>
+                    <a class="has-arrow" href="javascript:;">
+                        <div class="parent-icon"><i class="bi bi-stickies-fill"></i>
+                        </div>
+                        <div class="menu-title">Manage Post</div>
+                    </a>
+                    <ul>
+                        <li> <a href="../category/all_category.php"><i class="bi bi-circle"></i>All Posts</a>
+                        </li>
+                    </ul>
+                </li>
+
+
+                <li>
+                    <a class="has-arrow" href="javascript:;">
+                        <div class="parent-icon"><i class="bi bi-person-fill"></i>
+                        </div>
+                        <div class="menu-title">Manage Users</div>
+                    </a>
+                    <ul>
+                        <li> <a href="../category/all_category.php"><i class="bi bi-circle"></i>All Users</a>
+                        </li>
+                    </ul>
+                </li>
+
                 <li>
                     <a class="has-arrow" href="javascript:;">
                         <div class="parent-icon"><i class="bi bi-people-fill"></i>

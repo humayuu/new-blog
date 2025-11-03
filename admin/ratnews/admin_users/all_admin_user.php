@@ -210,10 +210,18 @@ require '../layout/header.php'
                         </div>
                     </div>
                 </div>
+                <?php 
+                // Fetch All Data
+                $sl = 1;
+                $sql = $conn->prepare('SELECT * FROM admin_user_tbl ORDER BY user_name DESC');
+                $sql->execute();
+                $adminUsers = $sql->fetchAll();
+                ?>
                 <div class="col-12 col-lg-8 d-flex">
                     <div class="card border shadow-none w-100">
                         <div class="card-body">
                             <div class="table-responsive">
+                                <?php if($adminUsers): ?>
                                 <table class="table align-middle">
                                     <thead class="table-light">
                                         <tr>
@@ -226,12 +234,15 @@ require '../layout/header.php'
                                         </tr>
                                     </thead>
                                     <tbody>
+                                        <?php foreach($adminUsers as $user): ?>
                                         <tr>
-                                            <td>1</td>
-                                            <td>asdasd</td>
-                                            <td>asdsaas</td>
-                                            <td>asdsa</td>
-                                            <td>Admin</td>
+                                            <td><?= $sl++ ?></td>
+                                            <td><?= htmlspecialchars($user['user_name']) ?></td>
+                                            <td><img class="img-thumbnail" width="100"
+                                                    src="<?= htmlspecialchars($user['user_image']) ?>" alt=""></td>
+                                            <td><?= htmlspecialchars($user['user_status']) ?></td>
+                                            <td><?= htmlspecialchars($user['user_role']) ?></td>
+                                            <?php if($user['user_role'] == 'author'): ?>
                                             <td>
                                                 <div class="d-flex align-items-center gap-3 fs-6">
                                                     <a href="#" class="text-primary" data-bs-toggle="tooltip"
@@ -244,24 +255,24 @@ require '../layout/header.php'
                                                         data-bs-original-title="Edit info" aria-label="Edit"><i
                                                             class="bi bi-hand-thumbs-down-fill"></i></a> -->
 
-                                                    <a href="#" class="text-secondary" data-bs-toggle="tooltip"
+                                                    <a href="edit_admin_user.php?id=<?= htmlspecialchars($user['id']) ?>"
+                                                        class="text-secondary" data-bs-toggle="tooltip"
                                                         data-bs-placement="bottom" title=""
                                                         data-bs-original-title="Edit info" aria-label="Edit"><i
                                                             class="bi bi-pencil-fill"></i></a>
 
-                                                    <a href="#" class="text-danger"
-                                                        onclick="return confirm('Are you Sure?')"
+                                                    <a href="delete_admin_user.php?id=<?= htmlspecialchars($user['id']) ?>"
+                                                        class="text-danger" onclick="return confirm('Are you Sure?')"
                                                         data-bs-toggle="tooltip" data-bs-placement="bottom" title=""
                                                         data-bs-original-title="Delete" aria-label="Delete"><i
                                                             class="bi bi-trash-fill"></i></a>
                                                 </div>
                                             </td>
+                                            <?php endif; ?>
                                         </tr>
+                                        <?php endforeach; ?>
                                     </tbody>
                                 </table>
-                                <!-- <div class="alert alert-danger fade show" role="alert">
-                                    <span>No Category Found!</span>
-                                </div> -->
                             </div>
                             <nav class="float-end mt-0" aria-label="Page navigation">
                                 <ul class="pagination">
@@ -272,6 +283,12 @@ require '../layout/header.php'
                                     <li class="page-item"><a class="page-link" href="#">Next</a></li>
                                 </ul>
                             </nav>
+                            <?php else: ?>
+                            <div class="alert alert-danger fade show" role="alert">
+                                <span>No Category Found!</span>
+                            </div>
+
+                            <?php endif; ?>
                         </div>
                     </div>
                 </div>
