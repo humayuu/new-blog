@@ -57,9 +57,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit'])) {
 
 
         // Store User data into session variable
-        $_SESSION['adminLoggedIn'] = true;
-        $_SESSION['adminId']       = $user['id'];
-        $_SESSION['adminUsername'] = $user['user_name'];
+        $_SESSION['adminLoggedIn']  = true;
+        $_SESSION['adminId']        = $user['id'];
+        $_SESSION['adminUsername']  = $user['user_name'];
+        $_SESSION['adminUserImage'] = $user['user_image'];
+        $_SESSION['adminUserRole']  = $user['user_role'];
 
         // Redirected to Admin Dashboard 
         header('Location: ratnews/category/dashboard.php');

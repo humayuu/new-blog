@@ -1,3 +1,4 @@
+<?php session_start(); ?>
 <!doctype html>
 <html lang="en">
 
@@ -55,27 +56,19 @@
                 <div class="dropdown dropdown-user-setting">
                     <a class="dropdown-toggle dropdown-toggle-nocaret" href="#" data-bs-toggle="dropdown">
                         <div class="user-setting d-flex align-items-center gap-3">
-                            <img src="../../assets/images/avatars/avatar-1.png" class="user-img" alt="">
+                            <!-- <img src="<?= $_SESSION['adminUserImage'] ?>" class="user-img" alt=""> -->
                             <div class="d-none d-sm-block">
-                                <p class="user-name mb-0">Jhon Deo</p>
-                                <small class="mb-0 dropdown-user-designation">HR Manager</small>
+                                <p class="user-name mb-0"><?= $_SESSION['adminUsername'] ?></p>
+                                <!-- <small class="mb-0 dropdown-user-designation"><?= $_SESSION['adminUserRole'] ?></small> -->
                             </div>
                         </div>
                     </a>
                     <ul class="dropdown-menu dropdown-menu-end">
                         <li>
-                            <a class="dropdown-item" href="pages-user-profile.html">
+                            <a class="dropdown-item" href="../admin_users/admin_profile.php">
                                 <div class="d-flex align-items-center">
                                     <div class=""><i class="bi bi-person-fill"></i></div>
                                     <div class="ms-3"><span>Profile</span></div>
-                                </div>
-                            </a>
-                        </li>
-                        <li>
-                            <a class="dropdown-item" href="#">
-                                <div class="d-flex align-items-center">
-                                    <div class=""><i class="bi bi-gear-fill"></i></div>
-                                    <div class="ms-3"><span>Setting</span></div>
                                 </div>
                             </a>
                         </li>
