@@ -56,10 +56,11 @@
                 <div class="dropdown dropdown-user-setting">
                     <a class="dropdown-toggle dropdown-toggle-nocaret" href="#" data-bs-toggle="dropdown">
                         <div class="user-setting d-flex align-items-center gap-3">
-                            <!-- <img src="<?= $_SESSION['adminUserImage'] ?>" class="user-img" alt=""> -->
+                            <img src="<?= $_SESSION['adminUserImage'] ?>" class="user-img" alt="">
                             <div class="d-none d-sm-block">
-                                <p class="user-name mb-0"><?= $_SESSION['adminUsername'] ?></p>
-                                <!-- <small class="mb-0 dropdown-user-designation"><?= $_SESSION['adminUserRole'] ?></small> -->
+                                <p class="user-name mb-0"><?= strtoupper($_SESSION['adminUsername']) ?></p>
+                                <small
+                                    class="mb-0 dropdown-user-designation"><?= strtoupper($_SESSION['adminUserRole']) ?></small>
                             </div>
                         </div>
                     </a>
