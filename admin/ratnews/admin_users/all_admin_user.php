@@ -244,16 +244,18 @@ require '../layout/header.php'
                                             <td><?= htmlspecialchars($user['user_role']) ?></td>
                                             <?php if($user['user_role'] == 'author'): ?>
                                             <td>
-                                                <div class="d-flex align-items-center gap-3 fs-6">
-                                                    <a href="#" class="text-primary" data-bs-toggle="tooltip"
+                                                <?php 
+                                               $class =  ($user['user_status'] == 'Active') ? 'primary' : 'dark';
+                                               $icon =  ($user['user_status'] == 'Active') ? 'thumbs-up' : 'thumbs-down';
+                                                ?>
+                                                <div class="d-flex align-items-center gap-3 fs-5">
+                                                    <a href="status_admin_user.php?id=<?= $user['id'] ?>"
+                                                        class="text-<?= $class ?>" data-bs-toggle="tooltip"
                                                         data-bs-placement="bottom" title=""
-                                                        data-bs-original-title="Edit info" aria-label="Edit"><i
-                                                            class="bi bi-hand-thumbs-up-fill"></i></a>
+                                                        data-bs-original-title="Edit info" aria-label="Edit">
+                                                        <i class="bi bi-hand-<?= $icon ?>-fill"></i>
 
-                                                    <!-- <a href="#" class="text-danger" data-bs-toggle="tooltip"
-                                                        data-bs-placement="bottom" title=""
-                                                        data-bs-original-title="Edit info" aria-label="Edit"><i
-                                                            class="bi bi-hand-thumbs-down-fill"></i></a> -->
+                                                    </a>
 
                                                     <a href="edit_admin_user.php?id=<?= htmlspecialchars($user['id']) ?>"
                                                         class="text-secondary" data-bs-toggle="tooltip"
