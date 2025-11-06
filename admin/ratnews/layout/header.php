@@ -21,6 +21,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
 
 
+
     <!-- loader-->
     <link href="../../assets/css/pace.min.css" rel="stylesheet" />
 
@@ -131,7 +132,8 @@
                         <div class="menu-title">Manage Post</div>
                     </a>
                     <ul>
-                        <li> <a href="../category/all_category.php"><i class="bi bi-circle"></i>All Posts</a>
+                        <li> <a href="../posts/add_post.php"><i class="bi bi-circle"></i>Add Posts</a>
+                        <li> <a href="../posts/view_all_post.php"><i class="bi bi-circle"></i>View Posts</a>
                         </li>
                     </ul>
                 </li>
@@ -144,7 +146,7 @@
                         <div class="menu-title">Manage Users</div>
                     </a>
                     <ul>
-                        <li> <a href="../category/all_category.php"><i class="bi bi-circle"></i>All Users</a>
+                        <li> <a href="../users/all_users.php"><i class="bi bi-circle"></i>All Users</a>
                         </li>
                     </ul>
                 </li>

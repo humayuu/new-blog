@@ -29,6 +29,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit'])) {
 
     $userName = filter_var(trim($_POST['username']), FILTER_SANITIZE_SPECIAL_CHARS);
     $password = filter_var(trim($_POST['password']));
+    $userStatus = 'Active';
 
     if (empty($userName) || empty($password)) {
         $_SESSION['errors'][] = 'Please Enter Your Username and Password';
@@ -38,8 +39,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit'])) {
 
     try {
         // Check if Your Admin user is Exists or not
-        $sql = $conn->prepare('SELECT * FROM admin_user_tbl WHERE user_name = :username');
+        $sql = $conn->prepare('SELECT * FROM admin_user_tbl WHERE user_name = :username AND user_status = :ustatus');
         $sql->bindParam(':username', $userName);
+        $sql->bindParam(':ustatus', $userStatus);
         $sql->execute();
         $user = $sql->fetch();
         if (!$user) {

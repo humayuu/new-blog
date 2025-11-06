@@ -110,7 +110,6 @@
 new PerfectScrollbar(".best-product")
    </script>
 
-
    </body>
 
    </html>
