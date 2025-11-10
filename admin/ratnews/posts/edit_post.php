@@ -1,136 +1,18 @@
 <?php
-session_start();
-
-// Connection to Database
 require '../../config/connection.php';
-
-// Initialize errors in session for persistence across redirects
-if (!isset($_SESSION['errors'])) {
-    $_SESSION['errors'] = [];
-}
-
-// Generate CSRF Token 
-if (empty($_SESSION['__csrf'])) {
-    $_SESSION['__csrf'] = bin2hex(random_bytes(32));
-}
-
-
-
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['isSubmitted'])) {
-    // Verify CSRF Token
-    if (!hash_equals($_SESSION['__csrf'], $_POST['__csrf'])) {
-        $_SESSION['errors'][] = 'Invalid CSRF Token';
-        header('Location: ' . basename(__FILE__));
-        exit;
-    }
-
-    $title = filter_var(trim($_POST['title']), FILTER_SANITIZE_SPECIAL_CHARS);
-    $content = trim($_POST['content']); // Don't sanitize HTML content from editor
-    $excerpt = filter_var(trim($_POST['excerpt']), FILTER_SANITIZE_SPECIAL_CHARS);
-    $status = filter_var(trim($_POST['status']), FILTER_SANITIZE_SPECIAL_CHARS);
-    $category = filter_var(trim($_POST['category']), FILTER_SANITIZE_SPECIAL_CHARS);
-    $tags = filter_var(trim($_POST['tags']), FILTER_SANITIZE_SPECIAL_CHARS);
-    $metaDescription = filter_var(trim($_POST['meta_description']), FILTER_SANITIZE_SPECIAL_CHARS);
-    $featuredPost = isset($_POST['is_featured']) ? 1 : 0;
-    $allowComments = isset($_POST['allow_comments']) ? 1 : 0;
-    $userId = $_SESSION['adminId'];
-    $image = null;
-
-    $allowedExtension = ['jpeg', 'jpg', 'png'];
-    $MaxFileSize = 2 * 1024 * 1024; // 2Mb;
-    $UploadDir = __DIR__ . '/uploads/post_image/';
-
-    // Create Upload Directory
-    if (!is_dir($UploadDir)) {
-        mkdir($UploadDir, 0755, true);
-    }
-
-
-    // Validations
-    if (empty($title) || empty($content) || empty($excerpt) || empty($status) || empty($category)  || empty($tags) || empty($allowComments)) {
-        $_SESSION['errors'][] = 'All Fields are Required';
-        header('Location: ' . basename(__FILE__));
-        exit;
-    }
-
-    // Post Image Upload
-    if (isset($_FILES['post_image']) && $_FILES['post_image']['error'] === UPLOAD_ERR_OK) {
-        $ext = strtolower(pathinfo($_FILES['post_image']['name'], PATHINFO_EXTENSION));
-        $size = $_FILES['post_image']['size'];
-        $tmpName = $_FILES['post_image']['tmp_name'];
-
-        if (!in_array($ext, $allowedExtension)) {
-            $_SESSION['errors'][] = 'File Extension is not allowed';
-            header('Location: ' . basename(__FILE__));
-            exit;
-        }
-
-        if ($size > $MaxFileSize) {
-            $_SESSION['errors'][] = 'Max File size is 2 MB';
-            header('Location: ' . basename(__FILE__));
-            exit;
-        }
-
-        $newName = uniqid('post_') . time() . '.' . $ext;
-
-        if (!move_uploaded_file($tmpName, $UploadDir . $newName)) {
-            $_SESSION['errors'][] = 'Max File size is 2 MB';
-            header('Location: ' . basename(__FILE__));
-            exit;
-        }
-
-        $image = 'uploads/post_image/' . $newName;
-    }
-
-    // Image Validation
-    if (empty($image)) {
-        $_SESSION['errors'][] = 'Post Image is Required';
-        header('Location: ' . basename(__FILE__));
-        exit;
-    }
-
-    // Inert Data into the Database
-    try {
-        $conn->beginTransaction();
-
-        $stmt = $conn->prepare('INSERT INTO post_tbl (post_title, post_content, post_excerpt, post_status, post_category, user_id, post_image, post_tags, post_meta_description, featured_post, allow_comments)
-                                                     VALUES (:ptitle, :pcontent, :pexcerpt, :pstatus, :pcategory, :user_Id, :pimage, :ptags, :pmeta_descp, :featured_post, :allow_comments)');
-        $stmt->bindParam(':ptitle', $title);
-        $stmt->bindParam(':pcontent', $content);
-        $stmt->bindParam(':pexcerpt', $excerpt);
-        $stmt->bindParam(':pstatus', $status);
-        $stmt->bindParam(':pcategory', $category);
-        $stmt->bindParam(':user_Id', $userId);
-        $stmt->bindParam(':pimage', $image);
-        $stmt->bindParam(':ptags', $tags);
-        $stmt->bindParam(':pmeta_descp', $metaDescription);
-        $stmt->bindParam(':featured_post', $featuredPost);
-        $stmt->bindParam(':allow_comments', $allowComments);
-        $result = $stmt->execute();
-
-        if ($result) {
-            $conn->commit();
-
-            $_SESSION['errors'][] = 'Post Successfully ' . strtoupper($status);
-            // Redirected to View All Post
-            header('Location: view_all_post.php');
-            exit;
-        }
-    } catch (Exception $e) {
-        $conn->rollBack();
-        $_SESSION['errors'][] = 'Post Insert Error ' . $e->getMessage();
-        header('Location: ' . basename(__FILE__));
-        exit;
-    }
-}
-
-
-
-$errors = $_SESSION['errors'] ?? [];
-$_SESSION['errors'] = [];
-
 require '../layout/header.php';
 
+
+
+// Fetch all Data for Specific ID
+if(isset($_GET['id'])){
+    $id = htmlspecialchars(trim($_GET['id']));
+
+    $sql = $conn->prepare('SELECT * FROM post_tbl WHERE id = :id');
+    $sql->bindParam(':id', $id);
+    $sql->execute();
+    $post = $sql->fetch();
+}
 ?>
 
 <!-- Include Quill stylesheet -->
@@ -179,18 +61,21 @@ require '../layout/header.php';
                         <div class="card-body">
                             <div class="mb-3">
                                 <label class="form-label">Title</label>
-                                <input type="text" class="form-control" name="title" placeholder="Post Title" autofocus>
+                                <input type="text" class="form-control" name="title" placeholder="Post Title"
+                                    value="<?= htmlspecialchars($post['post_title']) ?>">
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">Content</label>
                                 <div id="editor" style="min-height: 300px;"></div>
-                                <textarea name="content" id="content-input" style="display: none;"></textarea>
+                                <textarea name="content" style="display: none;"
+                                    id="content-input"><?= htmlspecialchars($post['post_content']) ?></textarea>
+
                             </div>
 
                             <div class="mb-3">
                                 <label class="form-label">Excerpt (Summary)</label>
                                 <textarea class="form-control" name="excerpt" rows="3"
-                                    placeholder="Short description for post preview"></textarea>
+                                    placeholder="Short description for post preview"><?= htmlspecialchars($post['post_excerpt']) ?></textarea>
                             </div>
                         </div>
                     </div>
@@ -199,15 +84,6 @@ require '../layout/header.php';
                 <div class="col-12 col-lg-4">
                     <div class="card border shadow-none w-100">
                         <div class="card-body">
-                            <div class="mb-3">
-                                <label class="form-label">Select Post Status</label>
-                                <select class="form-select" name="status">
-                                    <option disabled selected>Select option</option>
-                                    <option value="published">Published</option>
-                                    <option value="scheduled">Scheduled</option>
-                                </select>
-                            </div>
-
                             <?php
                             // Fetch All Category
                             $sql = $conn->prepare('SELECT * FROM category_tbl ORDER BY category_name');
@@ -219,7 +95,8 @@ require '../layout/header.php';
                                 <select class="form-select" name="category">
                                     <option disabled selected>Select Post Category</option>
                                     <?php foreach ($categories as $category): ?>
-                                    <option value="<?= htmlspecialchars($category['id']) ?>">
+                                    <option <?= ($category['id'] == $post['post_category']) ? 'selected' : '' ?>
+                                        value="<?= htmlspecialchars($category['id']) ?>">
                                         <?= htmlspecialchars($category['category_name']) ?></option>
                                     <?php endforeach; ?>
                                 </select>
@@ -228,12 +105,15 @@ require '../layout/header.php';
                             <div class="mb-3">
                                 <label class="form-label">Featured Image</label>
                                 <input type="file" class="form-control" name="post_image" accept="image/*">
+                                <img class="img-thumbnail  m-1" width="200"
+                                    src="<?= htmlspecialchars($post['post_image']) ?>" alt="image">
                             </div>
 
                             <div class="mb-3">
                                 <label class="form-label">Tags</label>
                                 <input type="text" class="form-control" name="tags"
-                                    placeholder="technology, news, breaking">
+                                    placeholder="technology, news, breaking"
+                                    value="<?= htmlspecialchars($post['post_tags']) ?>">
                                 <small class="text-muted">Separate tags with commas</small>
                             </div>
 
@@ -241,13 +121,13 @@ require '../layout/header.php';
                             <div class="mb-3">
                                 <label class="form-label">Meta Description (SEO)</label>
                                 <textarea class="form-control" name="meta_description" rows="3"
-                                    placeholder="SEO description for search engines"></textarea>
+                                    placeholder="SEO description for search engines"><?= htmlspecialchars($post['post_meta_description']) ?></textarea>
                             </div>
 
                             <div class="mb-3">
                                 <div class="form-check">
                                     <input class="form-check-input" type="checkbox" name="is_featured" id="isFeatured"
-                                        value="1">
+                                        value="1" <?= ($post['featured_post'] == '1') ? 'checked' : '' ?>>
                                     <label class="form-check-label" for="isFeatured">
                                         Featured Post
                                     </label>
@@ -257,7 +137,8 @@ require '../layout/header.php';
                             <div class="mb-3">
                                 <div class="form-check">
                                     <input class="form-check-input" type="checkbox" name="allow_comments"
-                                        id="allowComments" value="1" checked>
+                                        id="allowComments" value="1"
+                                        <?= ($post['allow_comments'] == '1') ? 'checked' : '' ?>>
                                     <label class="form-check-label" for="allowComments">
                                         Allow Comments
                                     </label>
@@ -265,7 +146,9 @@ require '../layout/header.php';
                             </div>
 
                             <div class="d-grid">
-                                <button type="submit" name="isSubmitted" class="btn btn-primary">Publish Post</button>
+                                <button type="submit" name="isSubmitted" class="btn btn-dark">Update Post</button>
+                                <a href="view_all_post.php" class="mt-2 btn btn-outline-dark">Cancel</a>
+
                             </div>
                         </div>
                     </div>
@@ -330,13 +213,18 @@ const quill = new Quill('#editor', {
     placeholder: 'Write your post content here...'
 });
 
-// Sync Quill content to hidden textarea before form submission
+// ✅ Load existing content into Quill
+const existingContent = <?= json_encode($post['post_content'] ?? '') ?>;
+quill.root.innerHTML = existingContent;
+
+// ✅ Sync Quill content to hidden textarea before form submission
 const form = document.getElementById('postForm');
 form.addEventListener('submit', function(e) {
     const contentInput = document.getElementById('content-input');
     contentInput.value = quill.root.innerHTML;
 });
 </script>
+
 
 <?php require '../layout/footer.php' ?>
 <?php $conn = null; ?>
