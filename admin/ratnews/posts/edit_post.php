@@ -4,15 +4,35 @@ require '../layout/header.php';
 
 
 
+
 // Fetch all Data for Specific ID
-if(isset($_GET['id'])){
-    $id = htmlspecialchars(trim($_GET['id']));
+if (isset($_GET['id'])) {
+    $id = filter_var($_GET['id'], FILTER_VALIDATE_INT);
+    if (!$id) {
+        $_SESSION['errors'][] = 'Invalid ID';
+        header('Location: view_all_post.php');
+        exit;
+    }
 
     $sql = $conn->prepare('SELECT * FROM post_tbl WHERE id = :id');
-    $sql->bindParam(':id', $id);
+    $sql->bindParam(':id', $id, PDO::PARAM_INT);
     $sql->execute();
     $post = $sql->fetch();
+
+    // Check if post exists
+    if (!$post) {
+        $_SESSION['errors'][] = 'Post not found';
+        header('Location: view_all_post.php');
+        exit;
+    }
+} else {
+    $_SESSION['errors'][] = 'No post ID provided';
+    header('Location: view_all_post.php');
+    exit;
 }
+
+$errors = $_SESSION['errors'] ?? [];
+$_SESSION['errors'] = [];
 ?>
 
 <!-- Include Quill stylesheet -->
@@ -37,45 +57,50 @@ if(isset($_GET['id'])){
 
     <div class="card">
         <div class="card-header py-3">
-            <h6 class="mb-0">Add Post</h6>
+            <h6 class="mb-0">Edit Post</h6>
         </div>
-        <!-- Display Errors -->
-        <?php if (!empty($errors)): ?>
-        <div class="row mt-3 justify-content-center">
-            <div class="col-md-9 col-lg-9">
-                <?php foreach ($errors as $error): ?>
-                <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                    <span><?= htmlspecialchars($error) ?></span>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-                <?php endforeach; ?>
-            </div>
-        </div>
-        <?php endif; ?>
+
         <div class="card-body">
+            <!-- Display Errors -->
+            <?php if (!empty($errors)): ?>
+            <div class="row mt-3 mb-3">
+                <div class="col-12">
+                    <?php foreach ($errors as $error): ?>
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <span><?= htmlspecialchars($error) ?></span>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+            <?php endif; ?>
+
             <form class="row g-3" method="POST" action="<?= htmlspecialchars(basename(__FILE__)) ?>"
                 enctype="multipart/form-data" id="postForm">
                 <input type="hidden" name="__csrf" value="<?= htmlspecialchars($_SESSION['__csrf']) ?>">
+                <input type="hidden" name="id" value="<?= htmlspecialchars($post['id']) ?>">
+                <input type="hidden" name="old_image" value="<?= htmlspecialchars($post['post_image']) ?>">
                 <div class="col-12 col-lg-8">
                     <div class="card border shadow-none w-100">
                         <div class="card-body">
                             <div class="mb-3">
                                 <label class="form-label">Title</label>
                                 <input type="text" class="form-control" name="title" placeholder="Post Title"
-                                    value="<?= htmlspecialchars($post['post_title']) ?>">
+                                    value="<?= htmlspecialchars($post['post_title']) ?>" required>
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">Content</label>
                                 <div id="editor" style="min-height: 300px;"></div>
-                                <textarea name="content" style="display: none;"
-                                    id="content-input"><?= htmlspecialchars($post['post_content']) ?></textarea>
+                                <textarea name="content" style="display: none;" id="content-input"
+                                    required><?= htmlspecialchars($post['post_content']) ?></textarea>
 
                             </div>
 
                             <div class="mb-3">
                                 <label class="form-label">Excerpt (Summary)</label>
                                 <textarea class="form-control" name="excerpt" rows="3"
-                                    placeholder="Short description for post preview"><?= htmlspecialchars($post['post_excerpt']) ?></textarea>
+                                    placeholder="Short description for post preview"
+                                    required><?= htmlspecialchars($post['post_excerpt']) ?></textarea>
                             </div>
                         </div>
                     </div>
@@ -92,8 +117,8 @@ if(isset($_GET['id'])){
                             ?>
                             <div class="mb-3">
                                 <label class="form-label">Select Post Category</label>
-                                <select class="form-select" name="category">
-                                    <option disabled selected>Select Post Category</option>
+                                <select class="form-select" name="category" required>
+                                    <option value="" disabled>Select Post Category</option>
                                     <?php foreach ($categories as $category): ?>
                                     <option <?= ($category['id'] == $post['post_category']) ? 'selected' : '' ?>
                                         value="<?= htmlspecialchars($category['id']) ?>">
@@ -105,15 +130,17 @@ if(isset($_GET['id'])){
                             <div class="mb-3">
                                 <label class="form-label">Featured Image</label>
                                 <input type="file" class="form-control" name="post_image" accept="image/*">
-                                <img class="img-thumbnail  m-1" width="200"
-                                    src="<?= htmlspecialchars($post['post_image']) ?>" alt="image">
+                                <?php if (!empty($post['post_image']) && file_exists(__DIR__ . '/' . $post['post_image'])): ?>
+                                <img class="img-thumbnail mt-2" width="200"
+                                    src="<?= htmlspecialchars($post['post_image']) ?>" alt="Current post image">
+                                <?php endif; ?>
                             </div>
 
                             <div class="mb-3">
                                 <label class="form-label">Tags</label>
                                 <input type="text" class="form-control" name="tags"
                                     placeholder="technology, news, breaking"
-                                    value="<?= htmlspecialchars($post['post_tags']) ?>">
+                                    value="<?= htmlspecialchars($post['post_tags']) ?>" required>
                                 <small class="text-muted">Separate tags with commas</small>
                             </div>
 
@@ -213,11 +240,11 @@ const quill = new Quill('#editor', {
     placeholder: 'Write your post content here...'
 });
 
-// ✅ Load existing content into Quill
+//  Load existing content into Quill
 const existingContent = <?= json_encode($post['post_content'] ?? '') ?>;
 quill.root.innerHTML = existingContent;
 
-// ✅ Sync Quill content to hidden textarea before form submission
+//  Sync Quill content to hidden textarea before form submission
 const form = document.getElementById('postForm');
 form.addEventListener('submit', function(e) {
     const contentInput = document.getElementById('content-input');

@@ -1,14 +1,14 @@
 <?php
-require '../layout/header.php';
+session_start();
+
+// Connection to Database
 require '../../config/connection.php';
 
 // Initialize errors
-if (!isset($_SESSION['errors'])) {
+if (isset($_SESSION['errors'])) {
     $_SESSION['errors'] = [];
 }
 
-$errors = $_SESSION['errors'] ?? [];
-$_SESSION['errors'] = [];
 
 $serialNo = 1;
 
@@ -17,11 +17,6 @@ $sql = $conn->prepare('SELECT * FROM admin_user_tbl WHERE id = :userId');
 $sql->execute(['userId' => $_SESSION['adminId']]);
 $user = $sql->fetch(); // Get single user
 
-// Check if user exists and is logged in
-if(!$user) {
-    header('Location: ../auth/login.php');
-    exit();
-}
 
 //  Fetch posts based on user role
 if($user['user_role'] === 'admin'){
@@ -52,7 +47,11 @@ if($user['user_role'] === 'admin'){
     $stmt->execute(['userId' => $_SESSION['adminId']]);
     $posts = $stmt->fetchAll();  
 }
+// Store Error in Variable
+$errors = $_SESSION['errors'] ?? [];
+$_SESSION['errors'] = [];
 
+require '../layout/header.php';
 ?>
 <!--start content-->
 <main class="page-content">
@@ -64,7 +63,7 @@ if($user['user_role'] === 'admin'){
                 <ol class="breadcrumb mb-0 p-0">
                     <li class="breadcrumb-item"><a href="javascript:;"><i class="bx bx-home-alt"></i></a>
                     </li>
-                    <li class="breadcrumb-item active" aria-current="page">Categories</li>
+                    <li class="breadcrumb-item active" aria-current="page">All Posts</li>
                 </ol>
             </nav>
         </div>
@@ -73,24 +72,24 @@ if($user['user_role'] === 'admin'){
 
     <div class="card">
         <div class="card-header py-3">
-            <h6 class="mb-0">Add Post Category</h6>
+            <h6 class="mb-0">All Posts</h6>
         </div>
 
         <div class="card-body">
             <div class="row">
-                <!-- Display Errors -->
+
+                <!-- Display Error Messages -->
                 <?php if (!empty($errors)): ?>
-                <div class="row mt-3 justify-content-center">
-                    <div class="col-md-8 col-lg-8">
-                        <?php foreach ($errors as $error): ?>
-                        <div class="alert alert-success alert-dismissible fade show" role="alert">
-                            <span><?= htmlspecialchars($error) ?></span>
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                        </div>
-                        <?php endforeach; ?>
+                <div class="col-12">
+                    <?php foreach ($errors as $error): ?>
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <span><?= htmlspecialchars($error) ?></span>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                     </div>
+                    <?php endforeach; ?>
                 </div>
                 <?php endif; ?>
+
                 <div class="col-12 col-lg-12 d-flex">
                     <div class="card border shadow-none w-100">
                         <div class="card-body">
@@ -164,21 +163,22 @@ if($user['user_role'] === 'admin'){
                                         <?php endforeach; ?>
                                     </tbody>
                                 </table>
+
+                                <nav class="float-end mt-0" aria-label="Page navigation">
+                                    <ul class="pagination">
+                                        <li class="page-item disabled"><a class="page-link" href="#">Previous</a></li>
+                                        <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                                        <li class="page-item"><a class="page-link" href="#">2</a></li>
+                                        <li class="page-item"><a class="page-link" href="#">3</a></li>
+                                        <li class="page-item"><a class="page-link" href="#">Next</a></li>
+                                    </ul>
+                                </nav>
+                                <?php else: ?>
+                                <div class="alert alert-danger fade show" role="alert">
+                                    <span>No Post Found</span>
+                                </div>
+                                <?php endif; ?>
                             </div>
-                            <nav class="float-end mt-0" aria-label="Page navigation">
-                                <ul class="pagination">
-                                    <li class="page-item disabled"><a class="page-link" href="#">Previous</a></li>
-                                    <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                                    <li class="page-item"><a class="page-link" href="#">2</a></li>
-                                    <li class="page-item"><a class="page-link" href="#">3</a></li>
-                                    <li class="page-item"><a class="page-link" href="#">Next</a></li>
-                                </ul>
-                            </nav>
-                            <?php else: ?>
-                            <div class="alert alert-danger fade show" role="alert">
-                                <span>No Post Found</span>
-                            </div>
-                            <?php endif; ?>
                         </div>
                     </div>
                 </div>
@@ -186,7 +186,6 @@ if($user['user_role'] === 'admin'){
             <!--end row-->
         </div>
 
-    </div>
     </div>
 
 </main>

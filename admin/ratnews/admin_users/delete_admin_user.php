@@ -40,7 +40,7 @@ try {
     }
 } catch (Exception $e) {
     $conn->rollBack();
-    $_SESSION['errors'][] = "Error in insert " . $e->getMessage();
+    $_SESSION['errors'][] = "Error in delete " . $e->getMessage();
     header('Location: all_admin_user.php');
     exit;
 }
