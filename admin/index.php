@@ -38,7 +38,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit'])) {
     }
 
     try {
-        // Check if Your Admin user is Exists or not
+        // Check if  Admin user is Exists or not
         $sql = $conn->prepare('SELECT * FROM admin_user_tbl WHERE user_name = :username AND user_status = :ustatus');
         $sql->bindParam(':username', $userName);
         $sql->bindParam(':ustatus', $userStatus);

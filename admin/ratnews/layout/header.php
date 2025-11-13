@@ -146,7 +146,7 @@
                         <div class="menu-title">Manage Users</div>
                     </a>
                     <ul>
-                        <li> <a href="../users/all_users.php"><i class="bi bi-circle"></i>All Users</a>
+                        <li> <a href="../users/all_user.php"><i class="bi bi-circle"></i>All Users</a>
                         </li>
                     </ul>
                 </li>

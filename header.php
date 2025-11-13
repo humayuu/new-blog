@@ -1,3 +1,4 @@
+<!-- <?php session_start(); ?> -->
 <!DOCTYPE html>
 <html lang="">
 
@@ -52,7 +53,7 @@
     <header class="bg-light">
         <!-- Navbar  Top-->
         <div class="topbar d-none d-sm-block">
-            <div class="container ">
+            <div class="container">
                 <div class="row">
                     <div class="col-sm-12 col-md-5">
                         <div class="topbar-left">
@@ -62,21 +63,24 @@
                         </div>
                     </div>
                     <div class="col-sm-12 col-md-7">
-                        <div class="list-unstyled topbar-right">
-                            <ul class="topbar-link">
-                                <li><a href="#" title="">Career</a></li>
-                                <li><a href="#" title="">Contact Us</a></li>
-                                <li><a href="register.php" title="">Login / Register</a></li>
+                        <div class="topbar-right">
+                            <ul class="topbar-link list-unstyled">
+                                <?php if(isset($_SESSION['userId'])): ?>
+                                <li><a href="#" title=""><?= htmlspecialchars($_SESSION['fullName']) ?></a></li>
+                                <li><a href="logout.php" title="">Logout</a></li>
+                                <?php else: ?>
+                                <li><a href="login.php" class="text-white" title="">Login / Register</a></li>
+                                <?php endif; ?>
                             </ul>
-                            <ul class="topbar-sosmed">
+                            <ul class="topbar-sosmed list-unstyled">
                                 <li>
-                                    <a href="#"><i class="fa fa-facebook"></i></a>
+                                    <a href="#" title="Facebook"><i class="fa fa-facebook"></i></a>
                                 </li>
                                 <li>
-                                    <a href="#"><i class="fa fa-twitter"></i></a>
+                                    <a href="#" title="Twitter"><i class="fa fa-twitter"></i></a>
                                 </li>
                                 <li>
-                                    <a href="#"><i class="fa fa-instagram"></i></a>
+                                    <a href="#" title="Instagram"><i class="fa fa-instagram"></i></a>
                                 </li>
                             </ul>
                         </div>
