@@ -1,5 +1,38 @@
 <?php
 require '../layout/header.php';
+
+// Connection to Database
+require '../../config/connection.php';
+
+
+// Initialize errors
+if (isset($_SESSION['errors'])) {
+    $_SESSION['errors'] = [];
+}
+
+
+$serialNo = 1;
+
+
+try{
+
+    $stmt = $conn->prepare('SELECT * FROM user_tbl ORDER BY user_fullname DESC');
+    $stmt->execute();
+    $users = $stmt->fetchAll();
+
+}catch(Exception $e){
+       $_SESSION['errors'][] = 'Error in Fetch all User from database ' . $e->getMessage();
+        header('Location: ' . basename(__FILE__));
+        exit;
+}
+
+
+
+
+// Store Error in Variable
+$errors = $_SESSION['errors'] ?? [];
+$_SESSION['errors'] = [];
+
 ?>
 <!--start content-->
 <main class="page-content">
@@ -22,6 +55,17 @@ require '../layout/header.php';
         <div class="card-header py-3">
             <h6 class="mb-0">All Users</h6>
         </div>
+        <!-- Display Error Messages -->
+        <?php if (!empty($errors)): ?>
+        <div class="col-12">
+            <?php foreach ($errors as $error): ?>
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <span><?= htmlspecialchars($error) ?></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            <?php endforeach; ?>
+        </div>
+        <?php endif; ?>
 
         <div class="card-body">
             <div class="row">
@@ -29,6 +73,7 @@ require '../layout/header.php';
                     <div class="card border shadow-none w-100">
                         <div class="card-body">
                             <div class="table-responsive">
+                                <?php if($users): ?>
                                 <table class="table align-middle">
                                     <thead class="table-light">
                                         <tr class="text-center">
@@ -44,23 +89,39 @@ require '../layout/header.php';
                                         </tr>
                                     </thead>
                                     <tbody>
+                                        <?php foreach($users as $user): ?>
                                         <tr class="text-center fs-6">
-                                            <td>1</td>
-                                            <td>Humayun</td>
-                                            <td>humayun@Gmail.com</td>
-                                            <td>male</td>
-                                            <td>Karachi</td>
-                                            <td>Pakistan</td>
+                                            <td><?= $serialNo++ ?></td>
+                                            <td><?= htmlspecialchars($user['user_fullname']) ?></td>
+                                            <td><?= htmlspecialchars($user['user_email']) ?></td>
+                                            <td><?= htmlspecialchars($user['user_gender']) ?></td>
+                                            <td><?= htmlspecialchars($user['user_city']) ?></td>
+                                            <td><?= htmlspecialchars($user['user_country']) ?></td>
+                                            <?php if(htmlspecialchars($user['user_status']) == '1'): ?>
                                             <td class="text-primary fs-5">Online</td>
-                                            <td class="badge text-bg-dark mt-3 fs-6">Active</td>
+                                            <?php else: ?>
+                                            <td class="text-dark fs-5">Offline</td>
+                                            <?php endif; ?>
+
+                                            <?php if(htmlspecialchars($user['user_admin_status']) == 'Active'): ?>
+                                            <td class="badge text-bg-success mt-3 fs-6">Active</td>
+                                            <?php else: ?>
+                                            <td class="badge text-bg-dark mt-3 fs-6">Inactive</td>
+                                            <?php endif; ?>
+
                                             <td>
+                                                <?php 
+                                               $class =  ($user['user_admin_status'] == 'Inactive') ? 'dark' : 'primary';
+                                               $icon =  ($user['user_admin_status'] == 'Active') ? 'thumbs-up' : 'thumbs-down';
+                                                ?>
                                                 <div class="m-2 fs-5">
-                                                    <a href="#" class="text-primary me-3" data-bs-toggle="tooltip"
+                                                    <a href="user_status.php?id=<?= htmlspecialchars($user['id']) ?>"
+                                                        class="text-<?= $class ?> me-3" data-bs-toggle="tooltip"
                                                         data-bs-placement="bottom" title=""
                                                         data-bs-original-title="Status" aria-label="Status"><i
-                                                            class="bi bi-hand-thumbs-up-fill"></i></a>
-                                                    <a href="#" class="text-danger"
-                                                        onclick="return confirm('Are you Sure?')"
+                                                            class="bi bi-hand-<?= $icon ?>-fill"></i></a>
+                                                    <a href="user_delete.php?id=<?= htmlspecialchars($user['id']) ?>"
+                                                        class="text-danger" onclick="return confirm('Are you Sure?')"
                                                         data-bs-toggle="tooltip" data-bs-placement="bottom" title=""
                                                         data-bs-original-title="Delete" aria-label="Delete"><i
                                                             class="bi bi-trash-fill"></i></a>
@@ -69,6 +130,7 @@ require '../layout/header.php';
 
 
                                         </tr>
+                                        <?php endforeach; ?>
                                     </tbody>
                                 </table>
 
@@ -81,9 +143,11 @@ require '../layout/header.php';
                                         <li class="page-item"><a class="page-link" href="#">Next</a></li>
                                     </ul>
                                 </nav>
-                                <!-- <div class="alert alert-danger fade show" role="alert">
+                                <?php else: ?>
+                                <div class="alert alert-danger fade show" role="alert">
                                     <span>No Post Found</span>
-                                </div> -->
+                                </div>
+                                <?php endif; ?>
                             </div>
                         </div>
                     </div>
