@@ -1,10 +1,19 @@
 <?php 
+session_start();
+
+// Connection to Database
+require '../../config/connection.php';
 
 // Generate CSRF Token
 if (!isset($_SESSION['__csrf'])) {
     $_SESSION['__csrf'] = bin2hex(random_bytes(32));
 }
 
+
+// Initialize errors in session for persistence across redirects
+if (!isset($_SESSION['errors'])) {
+    $_SESSION['errors'] = [];
+}
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['isSubmitted'])) {
     

@@ -56,7 +56,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['isSubmitted'])) {
     // Post Image Upload
     if (isset($_FILES['post_image']) && $_FILES['post_image']['error'] === UPLOAD_ERR_OK) {
         $ext = strtolower(pathinfo($_FILES['post_image']['name'], PATHINFO_EXTENSION));
-        $size = $_FILES['post_image']['size'];
+        $size = $_FILES['post_image']['size'];  
         $tmpName = $_FILES['post_image']['tmp_name'];
 
         if (!in_array($ext, $allowedExtension)) {

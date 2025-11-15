@@ -162,6 +162,17 @@
                         </li>
                     </ul>
                 </li>
+                <li>
+                    <a class="has-arrow" href="javascript:;">
+                        <div class="parent-icon"><i class="bi bi-gear-fill"></i>
+                        </div>
+                        <div class="menu-title">Manage Settings</div>
+                    </a>
+                    <ul>
+                        <li> <a href="../settings/settings.php"><i class="bi bi-circle"></i>All Settings</a>
+                        </li>
+                    </ul>
+                </li>
             </ul>
             <!--end navigation-->
         </aside>

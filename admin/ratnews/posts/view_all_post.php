@@ -104,7 +104,7 @@ require '../layout/header.php';
                                             <th>Post Status</th>
                                             <th>Post Category</th>
                                             <?php if($user['user_role'] == 'admin'): ?>
-                                            <th>User</th>
+                                            <th>Author</th>
                                             <?php endif; ?>
                                             <th>Post Image</th>
                                             <th>Action</th>

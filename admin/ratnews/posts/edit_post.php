@@ -2,8 +2,10 @@
 require '../../config/connection.php';
 require '../layout/header.php';
 
-
-
+// Initialize errors in session for persistence across redirects
+if (!isset($_SESSION['errors'])) {
+    $_SESSION['errors'] = [];
+}
 
 // Fetch all Data for Specific ID
 if (isset($_GET['id'])) {
@@ -75,8 +77,7 @@ $_SESSION['errors'] = [];
             </div>
             <?php endif; ?>
 
-            <form class="row g-3" method="POST" action="<?= htmlspecialchars(basename(__FILE__)) ?>"
-                enctype="multipart/form-data" id="postForm">
+            <form class="row g-3" method="POST" action="update_post.php" enctype="multipart/form-data" id="postForm">
                 <input type="hidden" name="__csrf" value="<?= htmlspecialchars($_SESSION['__csrf']) ?>">
                 <input type="hidden" name="id" value="<?= htmlspecialchars($post['id']) ?>">
                 <input type="hidden" name="old_image" value="<?= htmlspecialchars($post['post_image']) ?>">
