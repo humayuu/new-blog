@@ -1,6 +1,6 @@
 <?php
-session_start();
 
+session_start();
 // Connection to Database
 require 'admin/config/connection.php';
 
@@ -50,6 +50,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['issSubmitted'])) {
             header('Location: ' . basename(__FILE__));
             exit;
         }
+
+            
 
         // Store User data into session variable
         $_SESSION['LoggedIn']      = true;

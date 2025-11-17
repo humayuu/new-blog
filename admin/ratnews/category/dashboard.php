@@ -294,6 +294,7 @@ require '../layout/header.php';
             </div>
         </div>
     </div>
+    </div>
     <!--end row-->
 
 

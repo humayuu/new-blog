@@ -1,4 +1,9 @@
-<?php require 'header.php'; ?>
+<?php
+session_start();
+
+require 'header.php';
+
+?>
 
 <!-- Tranding news  carousel-->
 <section class="bg-light">

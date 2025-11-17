@@ -10,6 +10,14 @@ if (!isset($_SESSION['errors'])) {
     $_SESSION['errors'] = [];
 }
 
+$limit = 5;
+if(isset($_GET['page'])){
+    $pageNo = $_GET['page'];
+}else{
+    $pageNo = 1;
+}
+
+$offSet = ($pageNo - 1) * $limit;
 
 // Generate CSRF Token
 if (empty($_SESSION['__csrf'])) {
@@ -69,8 +77,7 @@ $_SESSION['errors'] = [];
 
 
 // Fetch all Data for Show category
-$sql = $conn->prepare('SELECT * FROM category_tbl ORDER BY category_name DESC');
-$sql->execute();
+$sql = $conn->query("SELECT * FROM category_tbl ORDER BY category_name DESC LIMIT $offSet, $limit");
 $categories = $sql->fetchAll();
 
 require '../layout/header.php'
@@ -177,13 +184,27 @@ require '../layout/header.php'
                                 </div>
                                 <?php endif; ?>
                             </div>
+                            <?php 
+                       $sql1 = $conn->prepare("SELECT COUNT(*) as total FROM category_tbl");
+                       $sql1->execute();
+                       $totalRows = $sql1->fetch()['total'];
+                       $totalPages = ceil($totalRows / $limit);
+
+
+                            ?>
                             <nav class="float-end mt-0" aria-label="Page navigation">
                                 <ul class="pagination">
-                                    <li class="page-item disabled"><a class="page-link" href="#">Previous</a></li>
-                                    <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                                    <li class="page-item"><a class="page-link" href="#">2</a></li>
-                                    <li class="page-item"><a class="page-link" href="#">3</a></li>
-                                    <li class="page-item"><a class="page-link" href="#">Next</a></li>
+                                    <li class="page-item <?= ($pageNo <= 1) ? 'disabled' : '' ?>">
+                                        <a class="page-link" href="?page=<?= $pageNo - 1 ?>">Previous</a>
+                                    </li>
+                                    <?php for($i = 1; $i <= $totalPages; $i++): ?>
+                                    <li class="page-item <?= ($i == $pageNo) ? 'active' : '' ?>">
+                                        <a class="page-link" href="?page=<?= $i ?>"><?= $i ?></a>
+                                    </li>
+                                    <?php endfor; ?>
+                                    <li class="page-item <?= ($pageNo >= $totalPages) ? 'disabled' : '' ?>">
+                                        <a class="page-link" href="?page=<?= $pageNo + 1 ?>">Next</a>
+                                    </li>
                                 </ul>
                             </nav>
                         </div>

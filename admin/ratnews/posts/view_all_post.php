@@ -10,6 +10,18 @@ if (isset($_SESSION['errors'])) {
 }
 
 
+$limit = 5;
+
+if(isset($_GET['page'])){
+    $pageNo = $_GET['page'];
+}else{
+    $pageNo = 1;
+}
+
+$offSet = ($pageNo - 1) * $limit;
+
+
+
 $serialNo = 1;
 
 //  Get the CURRENT logged-in user
@@ -29,7 +41,7 @@ if($user['user_role'] === 'admin'){
                            FROM post_tbl
                            LEFT JOIN category_tbl ON post_tbl.post_category = category_tbl.id  
                            LEFT JOIN admin_user_tbl ON post_tbl.user_id = admin_user_tbl.id
-                           ORDER BY post_tbl.id DESC");
+                           ORDER BY post_tbl.id DESC LIMIT $offSet, $limit");
     $stmt->execute();
     $posts = $stmt->fetchAll();                               
 } else {
@@ -43,7 +55,7 @@ if($user['user_role'] === 'admin'){
                            LEFT JOIN category_tbl ON post_tbl.post_category = category_tbl.id  
                            LEFT JOIN admin_user_tbl ON post_tbl.user_id = admin_user_tbl.id
                            WHERE post_tbl.user_id = :userId
-                           ORDER BY post_tbl.id DESC");
+                           ORDER BY post_tbl.id DESC LIMIT $offSet, $limit");
     $stmt->execute(['userId' => $_SESSION['adminId']]);
     $posts = $stmt->fetchAll();  
 }
@@ -120,7 +132,7 @@ require '../layout/header.php';
                                             <?php 
                                             $class =  ($post['post_status'] == 'published') ? 'primary' : 'dark';
                                             ?>
-                                            <td class="badge text-bg-<?= $class ?> mt-3">
+                                            <td class="badge text-bg-<?= $class ?> mt-5">
 
                                                 <strong><?= strtoupper(htmlspecialchars($post['post_status'])) ?></strong>
                                             </td>
@@ -164,13 +176,27 @@ require '../layout/header.php';
                                     </tbody>
                                 </table>
 
+                                <?php 
+                                $query = $conn->prepare("SELECT COUNT(*) as total FROM post_tbl");
+                                $query->execute();
+                                $totalRows = $query->fetch()['total'];
+                                 $totalPages = ceil($totalRows / $limit);                                ?>
+
                                 <nav class="float-end mt-0" aria-label="Page navigation">
                                     <ul class="pagination">
-                                        <li class="page-item disabled"><a class="page-link" href="#">Previous</a></li>
-                                        <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                                        <li class="page-item"><a class="page-link" href="#">2</a></li>
-                                        <li class="page-item"><a class="page-link" href="#">3</a></li>
-                                        <li class="page-item"><a class="page-link" href="#">Next</a></li>
+                                        <li class="page-item <?= ($pageNo <= 1) ? 'disabled' : '' ?>">
+                                            <a class="page-link" href="?page=<?= $pageNo - 1 ?>">Previous</a>
+                                        </li>
+
+                                        <?php for($i = 1; $i <= $totalPages; $i++): ?>
+                                        <li class="page-item <?= ($i == $pageNo) ? 'active' : '' ?>">
+                                            <a class="page-link" href="?page=<?= $i ?>"><?= $i ?></a>
+                                        </li>
+                                        <?php endfor; ?>
+
+                                        <li class="page-item <?= ($pageNo >= $totalPages) ? 'disabled' : '' ?>">
+                                            <a class="page-link" href="?page=<?= $pageNo + 1 ?>">Next</a>
+                                        </li>
                                     </ul>
                                 </nav>
                                 <?php else: ?>
@@ -186,6 +212,7 @@ require '../layout/header.php';
             <!--end row-->
         </div>
 
+    </div>
     </div>
 
 </main>
