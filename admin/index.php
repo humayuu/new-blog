@@ -65,9 +65,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit'])) {
         $_SESSION['adminUserImage'] = $user['user_image'];
         $_SESSION['adminUserRole']  = $user['user_role'];
 
-        // Redirected to Admin Dashboard 
+        if($_SESSION['adminUserRole'] == 'admin'){
+            // Redirected to Admin Dashboard 
         header('Location: ratnews/category/dashboard.php');
         exit;
+        }else{
+        // Redirected to Admin Dashboard 
+        header('Location: ratnews/posts/view_all_post.php');
+        exit;
+        }
+
+        
     } catch (Exception $e) {
         $_SESSION['errors'][] = 'Admin Login Error ' . $e->getMessage();
         header('Location: ' . basename(__FILE__));

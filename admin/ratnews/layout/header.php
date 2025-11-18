@@ -1,4 +1,14 @@
-<?php session_start(); ?>
+<?php
+session_start();
+  if (! isset($_SESSION['adminLoggedIn']) || $_SESSION['adminLoggedIn'] !== true) {
+        $_SESSION['errors'][] = 'Please Login First';
+        header('Location: ../../index.php');
+        exit;
+    }
+
+
+
+?>
 <!doctype html>
 <html lang="en">
 
@@ -105,8 +115,9 @@
             </div>
             <!--navigation-->
             <ul class="metismenu" id="menu">
+                <?php if( $_SESSION['adminUserRole'] == 'admin'): ?>
                 <li>
-                    <a href="javascript:;">
+                    <a href="../category/dashboard.php">
                         <div class="parent-icon"><i class="bi bi-house-fill"></i>
                         </div>
                         <div class="menu-title">Dashboard</div>
@@ -124,6 +135,7 @@
                         </li>
                     </ul>
                 </li>
+                <?php endif; ?>
 
                 <li>
                     <a class="has-arrow" href="javascript:;">
@@ -138,6 +150,7 @@
                     </ul>
                 </li>
 
+                <?php if( $_SESSION['adminUserRole'] == 'admin'): ?>
 
                 <li>
                     <a class="has-arrow" href="javascript:;">
@@ -173,6 +186,7 @@
                         </li>
                     </ul>
                 </li>
+                <?php endif; ?>
             </ul>
             <!--end navigation-->
         </aside>

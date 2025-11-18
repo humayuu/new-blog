@@ -132,7 +132,7 @@ require '../layout/header.php';
                                             <?php 
                                             $class =  ($post['post_status'] == 'published') ? 'primary' : 'dark';
                                             ?>
-                                            <td class="badge text-bg-<?= $class ?> mt-5">
+                                            <td class="badge text-bg-<?= $class ?> m-4">
 
                                                 <strong><?= strtoupper(htmlspecialchars($post['post_status'])) ?></strong>
                                             </td>
