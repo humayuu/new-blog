@@ -412,7 +412,7 @@ require 'header.php';
                             $totalRows = $query->fetch()['total'];
                             $totalPages = ceil($totalRows / $limit);
                             ?>
-                                <!-- Pagination -->
+                                <!-- Add Pagination -->
                                 <div class="pagination-area">
                                     <div class="pagination wow fadeIn animated" data-wow-duration="2s"
                                         data-wow-delay="0.5s"
