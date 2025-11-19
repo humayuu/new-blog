@@ -122,7 +122,8 @@ $categories = $stmt->fetchAll();
                             </li>
                             <?php foreach($categories as $category): ?>
                             <li class="nav-item">
-                                <a class="nav-link" href="category.php?id=<?= htmlentities($category['id']) ?>">
+                                <a class="nav-link"
+                                    href="category.php?category_id=<?= htmlentities($category['id']) ?>">
                                     <?= htmlentities($category['category_name']) ?> </a>
                             </li>
                             <?php  endforeach; ?>

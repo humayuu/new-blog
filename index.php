@@ -105,7 +105,7 @@ require 'header.php';
                                     </div>
                                     <div class="card__post__title">
                                         <h6>
-                                            <a href="./card-article-detail-v1.html">
+                                            <a href="article-detail.php?id=<?= $post['id']; ?>">
                                                 <?= htmlspecialchars(substr(strip_tags($post['post_content']), 0, 50)) ?>...
                                             </a>
                                         </h6>
@@ -150,9 +150,8 @@ require 'header.php';
                                         </div>
                                         <div class="card__post__title">
                                             <h2>
-                                                <a href="#">
+                                                <a href="article-detail.php?id=<?= $post['id']; ?>">
                                                     <?= htmlspecialchars(substr(strip_tags($post['post_content']), 0, 50)) ?>...
-
                                                 </a>
                                             </h2>
                                         </div>
@@ -238,7 +237,7 @@ require 'header.php';
                                                 </div>
                                                 <div class="card__post__title">
                                                     <h6>
-                                                        <a href="./card-article-detail-v1.html">
+                                                        <a href="article-detail.php?id=<?= $post['id']; ?>">
                                                             <?= htmlspecialchars(substr(strip_tags($post['post_content']), 0, 50)) ?>...
                                                         </a>
                                                     </h6>
@@ -274,7 +273,7 @@ require 'header.php';
                                                 <?php foreach($posts as $post): ?>
                                                 <div class="col-md-5">
                                                     <div class="card__post__transition">
-                                                        <a href="#">
+                                                        <a href="article-detail.php?id=<?= $post['id'] ?>">
                                                             <img src="admin/ratnews/posts/<?= htmlspecialchars($post['post_image']) ?>"
                                                                 class="img-fluid"
                                                                 alt="<?= htmlspecialchars($post['post_title'] ?? 'Post image') ?>">
