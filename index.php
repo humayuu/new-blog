@@ -42,7 +42,6 @@ try{
     
 }
 
-
 // Store Error in Variable
 $errors = $_SESSION['errors'] ?? [];
 $_SESSION['errors'] = [];
@@ -158,7 +157,7 @@ require 'header.php';
                                         <div class="card__post__author-info">
                                             <ul class="list-inline">
                                                 <li class="list-inline-item">
-                                                    <a href="#">
+                                                    <a href="author.php?auth_id=<?= $post['user_id'] ?>">
                                                         <?= htmlentities($post['user_name']) ?>
                                                     </a>
                                                 </li>
