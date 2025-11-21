@@ -8,6 +8,19 @@ require '../../config/connection.php';
 if (isset($_SESSION['errors'])) {
     $_SESSION['errors'] = [];
 }
+
+
+try{
+
+    $stmt  = $conn->prepare('SELECT ');
+
+}catch(Exception $e){
+    $_SESSION['errors'][] = 'Error in fetch comments ' . $e->getMessage();
+    header('Location: ' . basename(__FILE__));
+    exit;
+}
+
+
 // Store Error in Variable
 $errors = $_SESSION['errors'] ?? [];
 $_SESSION['errors'] = [];
@@ -71,12 +84,23 @@ require '../layout/header.php';
                                             <td>1</td>
                                             <td>ggg</td>
                                             <td>ggg</td>
+                                            <td>ggg</td>
+                                            <td>ggg</td>
                                             <td>
                                                 <div class="m-2 fs-5">
-                                                    <a href="#" class="text-<?= $class ?> me-3" data-bs-toggle="tooltip"
+                                                    <a href="#" class="text-dark fs-2 me-3" data-bs-toggle="tooltip"
                                                         data-bs-placement="bottom" title=""
                                                         data-bs-original-title="Status" aria-label="Status"><i
-                                                            class="bi bi-hand-<?= $icon ?>-fill"></i></a>
+                                                            class="bi bi-check2-circle"></i></a>
+                                                    <a href="#" class="text-dark fs-4 me-3" data-bs-toggle="tooltip"
+                                                        data-bs-placement="bottom" title=""
+                                                        data-bs-original-title="View" aria-label="View"><i
+                                                            class="bi bi-eye-fill"></i></a>
+                                                    <a href="de#" class="text-danger fs-4"
+                                                        onclick="return confirm('Are you Sure?')"
+                                                        data-bs-toggle="tooltip" data-bs-placement="bottom" title=""
+                                                        data-bs-original-title="Delete" aria-label="Delete"><i
+                                                            class="bi bi-trash-fill"></i></a>
                                                 </div>
                                             </td>
 

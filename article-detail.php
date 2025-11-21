@@ -1,15 +1,24 @@
 <?php
 session_start();
 
-// Initialize errors in session for persistence across redirects
-if (!isset($_SESSION['errors'])) {
-    $_SESSION['errors'] = [];
+// Initialize message in session for persistence across redirects
+if (!isset($_SESSION['message'])) {
+    $_SESSION['message'] = [];
 }
 
+// Generate CSRF Token
+if (!isset($_SESSION['__csrf'])) {
+    $_SESSION['__csrf'] = bin2hex(random_bytes(32));
+}
 // Connection to Database
 require 'admin/config/connection.php';
 
 try {
+    if (!isset($_GET['id']) || empty($_GET['id'])) {
+        $_SESSION['message'][] = 'Invalid post ID';
+        header('Location: index.php');
+        exit;
+    }
     $id = htmlspecialchars(trim($_GET['id']));
 
     $stmt = $conn->prepare("SELECT 
@@ -20,31 +29,69 @@ try {
                            LEFT JOIN category_tbl ON post_tbl.post_category = category_tbl.id  
                            LEFT JOIN admin_user_tbl ON post_tbl.user_id = admin_user_tbl.id
                            WHERE post_status = 'published' AND post_tbl.id = :id");
-    $stmt->execute([$id]);
+    $stmt->bindParam(':id', $id);
+    $stmt->execute();
     $post = $stmt->fetch();
-    
+
     if (!$post) {
         throw new Exception('Post not found');
     }
 } catch (Exception $e) {
-    $_SESSION['errors'][] = 'No Record Found! ' . $e->getMessage();
+    $_SESSION['message'][] = 'No Record Found! ' . $e->getMessage();
     header('Location: index.php');
     exit;
 }
 
+
+// Add Comments
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit'])) {
+    // Verify CSRF Token
+    if (!hash_equals($_SESSION['__csrf'], $_POST['__csrf'])) {
+        header('Location: ' . basename(__FILE__));
+        exit;
+    }
+
+    $userId = $_SESSION['userId'];
+    $postId = $id;
+    $comments = filter_var(trim($_POST['comment']), FILTER_SANITIZE_SPECIAL_CHARS);
+    $commentsStatus = '0';
+
+
+    try {
+
+        $query = $conn->prepare('INSERT INTO comments_tbl (user_id, post_id, comment, comment_status) VALUES (:userid, :postId, :userComment, :commentStatus)');
+        $query->bindParam(':userid', $userId);
+        $query->bindParam(':postId', $postId);
+        $query->bindParam(':userComment', $comments);
+        $query->bindParam(':commentStatus', $commentsStatus);
+        $result = $query->execute();
+
+        if ($result) {
+            $_SESSION['message'][] = 'Comment submitted successfully. Please wait for admin approval.';
+            header('Location: article-detail.php?id=' . $id);
+            exit;
+        }
+    } catch (Exception $e) {
+        $_SESSION['message'][] = 'error in Add comments' . $e->getMessage();
+        header('Location: ' . basename(__FILE__));
+        exit;
+    }
+}
+
 // Store Error in Variable
-$errors = $_SESSION['errors'] ?? [];
-$_SESSION['errors'] = [];
+$message = $_SESSION['message'] ?? [];
+$_SESSION['message'] = [];
 
 require 'header.php';
 ?>
 
 <section class="py-5">
     <div class="container">
-        <?php if (!empty($errors)): ?>
+        <?php if (!empty($message)): ?>
         <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            <?php foreach ($errors as $error): ?>
-            <p class="mb-0"><?= htmlspecialchars($error) ?></p>
+            <?php foreach ($message as $msg): ?>
+            <p class="mb-0"><?= htmlspecialchars($msg) ?></p>
             <?php endforeach; ?>
             <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                 <span aria-hidden="true">&times;</span>
@@ -168,17 +215,17 @@ require 'header.php';
                     </ol>
 
 
-                    <?php if(isset($_SESSION['LoggedIn']) && $_SESSION['LoggedIn'] !== false): ?>
+                    <?php if (isset($_SESSION['LoggedIn']) && $_SESSION['LoggedIn'] !== false): ?>
                     <!-- Comment Form -->
                     <div class="comment-respond mt-5">
                         <h3 class="comment-reply-title mb-4">Leave Your Comment</h3>
 
-                        <form class="comment-form" method="POST" action="<?= htmlspecialchars(basename(__FILE__)) ?>">
-                            <input type="hidden" name="__csrf" value="<?= htmlspecialchars($_SESSION['__csrf']) ?>">
+                        <form method="post" action="article-detail.php?id=<?= $id ?>"> <input type="hidden"
+                                name="__csrf" value="<?= htmlspecialchars($_SESSION['__csrf']) ?>">
 
                             <div class="form-group">
                                 <label for="comment">Comment <span class="text-danger">*</span></label>
-                                <textarea name="comment" class="form-control" rows="5" maxlength="65525"></textarea>
+                                <textarea name="comment" class="form-control" rows="5"></textarea>
                             </div>
 
                             <div class="form-group">
