@@ -145,7 +145,7 @@ $categories = $stmt->fetchAll();
                         <div class="top-search navigation-shadow">
                             <div class="container">
                                 <div class="input-group ">
-                                    <form method="post" action="search-result.php">
+                                    <form method="GET" action="search-result.php">
 
                                         <div class="row no-gutters mt-3">
                                             <div class="col">

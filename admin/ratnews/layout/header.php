@@ -186,6 +186,18 @@ session_start();
                         </li>
                     </ul>
                 </li>
+
+                <li>
+                    <a class="has-arrow" href="javascript:;">
+                        <div class="parent-icon"><i class="bi bi-chat-left-text-fill"></i>
+                        </div>
+                        <div class="menu-title">Manage Comments</div>
+                    </a>
+                    <ul>
+                        <li> <a href="../comments/all_comments.php"><i class="bi bi-circle"></i>All Comments</a>
+                        </li>
+                    </ul>
+                </li>
                 <?php endif; ?>
             </ul>
             <!--end navigation-->

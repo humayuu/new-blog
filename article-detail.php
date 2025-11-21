@@ -161,95 +161,37 @@ require 'header.php';
                                                 since the 1500s, when an unknown printer took a galley of type and
                                                 scrambled it to make a type specimen book.</p>
                                         </div>
-
-                                        <div class="reply">
-                                            <a href="#" class="btn btn-sm btn-link text-primary p-0">Reply</a>
-                                        </div>
                                     </div>
                                 </div>
-
-                                <!-- Nested Comment -->
-                                <ol class="children list-unstyled ml-5 mt-3">
-                                    <li class="comment">
-                                        <div class="comment-body">
-                                            <div class="d-flex">
-                                                <img src="images/placeholder/80x80.jpg"
-                                                    class="avatar rounded-circle mr-3" alt="Commenter"
-                                                    style="width: 50px; height: 50px; object-fit: cover;">
-
-                                                <div class="flex-grow-1">
-                                                    <div class="comment-meta mb-2">
-                                                        <h6 class="mb-0">
-                                                            <strong>Sinmun</strong>
-                                                            <small class="text-muted ml-2">April 24, 2019 at 10:59
-                                                                am</small>
-                                                        </h6>
-                                                    </div>
-
-                                                    <div class="comment-content mb-2">
-                                                        <p class="mb-0">Lorem Ipsum has been the industry's standard
-                                                            dummy text ever since the 1500s, when an unknown printer
-                                                            took a galley of type and scrambled it to make a type
-                                                            specimen book.</p>
-                                                    </div>
-
-                                                    <div class="reply">
-                                                        <a href="#"
-                                                            class="btn btn-sm btn-link text-primary p-0">Reply</a>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </li>
-                                </ol>
                             </div>
                         </li>
                     </ol>
 
+
+                    <?php if(isset($_SESSION['LoggedIn']) && $_SESSION['LoggedIn'] !== false): ?>
                     <!-- Comment Form -->
                     <div class="comment-respond mt-5">
-                        <h3 class="comment-reply-title mb-4">Leave a Reply</h3>
+                        <h3 class="comment-reply-title mb-4">Leave Your Comment</h3>
 
-                        <form class="comment-form" method="POST" action="">
-                            <p class="text-muted mb-4">
-                                <small>Your email address will not be published. Required fields are marked <span
-                                        class="text-danger">*</span></small>
-                            </p>
+                        <form class="comment-form" method="POST" action="<?= htmlspecialchars(basename(__FILE__)) ?>">
+                            <input type="hidden" name="__csrf" value="<?= htmlspecialchars($_SESSION['__csrf']) ?>">
 
                             <div class="form-group">
                                 <label for="comment">Comment <span class="text-danger">*</span></label>
-                                <textarea name="comment" id="comment" class="form-control" rows="5" maxlength="65525"
-                                    required></textarea>
-                            </div>
-
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label for="author">Name <span class="text-danger">*</span></label>
-                                        <input type="text" id="author" name="name" class="form-control" required>
-                                    </div>
-                                </div>
-
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label for="email">Email <span class="text-danger">*</span></label>
-                                        <input type="email" id="email" name="email" class="form-control" required>
-                                    </div>
-                                </div>
+                                <textarea name="comment" class="form-control" rows="5" maxlength="65525"></textarea>
                             </div>
 
                             <div class="form-group">
-                                <label for="url">Website</label>
-                                <input type="url" id="url" name="url" class="form-control">
-                            </div>
-
-                            <div class="form-group">
-                                <button type="submit" name="submit" class="btn btn-primary px-4 py-2">
+                                <button type="submit" name="submit" class="btn btn-primary mt-2 px-4 py-2">
                                     Post Comment
                                 </button>
                             </div>
                         </form>
                     </div>
+                    <?php else: ?>
+                    <a href="login.php" class="btn btn-dark m-5">Login / Register</a>
+                    <?php endif; ?>
+
                 </div>
             </div>
         </div>
