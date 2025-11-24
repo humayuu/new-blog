@@ -1,6 +1,8 @@
 <?php
 session_start();
 
+$serialNo = 1;
+
 // Connection to Database
 require '../../config/connection.php';
 
@@ -12,7 +14,15 @@ if (isset($_SESSION['errors'])) {
 
 try{
 
-    $stmt  = $conn->prepare('SELECT ');
+    $stmt = $conn->prepare('SELECT comments_tbl.*,
+                                  user_tbl.user_fullname,
+                                  post_tbl.post_title
+                                 FROM comments_tbl
+                                 LEFT JOIN user_tbl ON comments_tbl.user_id = user_tbl.id
+                                 LEFT JOIN post_tbl ON comments_tbl.post_id = post_tbl.id
+                                 ORDER BY post_tbl.id DESC');
+    $stmt->execute();
+    $comments = $stmt->fetchAll();
 
 }catch(Exception $e){
     $_SESSION['errors'][] = 'Error in fetch comments ' . $e->getMessage();
@@ -68,6 +78,7 @@ require '../layout/header.php';
                     <div class="card border shadow-none w-100">
                         <div class="card-body">
                             <div class="table-responsive">
+                                <?php if($comments): ?>
                                 <table class="table align-middle">
                                     <thead class="table-light">
                                         <tr class="text-center">
@@ -80,34 +91,50 @@ require '../layout/header.php';
                                         </tr>
                                     </thead>
                                     <tbody>
+                                        <?php foreach($comments as $comment): ?>
                                         <tr class="text-center">
-                                            <td>1</td>
-                                            <td>ggg</td>
-                                            <td>ggg</td>
-                                            <td>ggg</td>
-                                            <td>ggg</td>
+                                            <td><?= $serialNo++ ?></td>
+                                            <td><?= htmlspecialchars($comment['user_fullname']) ?></td>
+                                            <td><?= htmlspecialchars(substr($comment['comment'], 0, 30)) ?></td>
+                                            <td><?= htmlspecialchars($comment['post_title']) ?></td>
+                                            <td>
+                                                <?php if($comment['comment_status'] == '0'): ?>
+                                                <span class="badge rounded-pill text-bg-dark">Pending</span>
+                                                <?php else: ?>
+                                                <span class="badge rounded-pill text-bg-success">Approved</span>
+                                                <?php endif; ?>
+                                            </td>
                                             <td>
                                                 <div class="m-2 fs-5">
-                                                    <a href="#" class="text-dark fs-2 me-3" data-bs-toggle="tooltip"
+                                                    <?php if($comment['comment_status'] == '0'): ?>
+                                                    <a href="comment_approved.php?id=<?= htmlspecialchars($comment['id']) ?>"
+                                                        class="text-dark fs-2 me-3" data-bs-toggle="tooltip"
                                                         data-bs-placement="bottom" title=""
                                                         data-bs-original-title="Status" aria-label="Status"><i
                                                             class="bi bi-check2-circle"></i></a>
-                                                    <a href="#" class="text-dark fs-4 me-3" data-bs-toggle="tooltip"
+                                                    <?php endif; ?>
+                                                    <a href="user_wise_comments.php?id=<?= htmlspecialchars($comment['id']) ?>"
+                                                        class="text-dark fs-4 me-3" data-bs-toggle="tooltip"
                                                         data-bs-placement="bottom" title=""
                                                         data-bs-original-title="View" aria-label="View"><i
                                                             class="bi bi-eye-fill"></i></a>
-                                                    <a href="de#" class="text-danger fs-4"
+                                                    <a href="delete_comment.php?id=<?= htmlspecialchars($comment['id']) ?>"
+                                                        class="text-danger fs-4"
                                                         onclick="return confirm('Are you Sure?')"
                                                         data-bs-toggle="tooltip" data-bs-placement="bottom" title=""
                                                         data-bs-original-title="Delete" aria-label="Delete"><i
                                                             class="bi bi-trash-fill"></i></a>
                                                 </div>
                                             </td>
-
-
                                         </tr>
+                                        <?php endforeach; ?>
                                     </tbody>
                                 </table>
+                                <?php else: ?>
+                                <div class="alert alert-danger fade show" role="alert">
+                                    <span>No Comments Found!</span>
+                                </div>
+                                <?php endif; ?>
                             </div>
                         </div>
                     </div>

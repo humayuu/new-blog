@@ -79,6 +79,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit'])) {
     }
 }
 
+// Fetch Approved Comments
+try {
+    $sq = $conn->prepare('SELECT comments_tbl.*, user_tbl.user_fullname as user_name 
+                          FROM comments_tbl 
+                          LEFT JOIN user_tbl ON comments_tbl.user_id = user_tbl.id
+                          WHERE comments_tbl.post_id = :postId AND comments_tbl.comment_status = "1"
+                          ORDER BY comments_tbl.created_at DESC');
+    $sq->bindParam(':postId', $id);
+    $sq->execute();
+    $comments = $sq->fetchAll();
+} catch (Exception $e) {
+    $_SESSION['message'][] = 'Error in fetching comments: ' . $e->getMessage();
+    $comments = []; 
+}
+
 // Store Error in Variable
 $message = $_SESSION['message'] ?? [];
 $_SESSION['message'] = [];
@@ -186,33 +201,37 @@ require 'header.php';
 
                 <!-- Comments Section -->
                 <div id="comments" class="comments-area mt-5 pt-4">
-                    <h3 class="comments-title mb-4">2 Comments</h3>
+                    <h3 class="comments-title mb-4">
+                        <?= count($comments) ?> Comment<?= count($comments) != 1 ? 's' : '' ?>
+                    </h3>
 
+                    <?php if (!empty($comments)): ?>
                     <ol class="comment-list list-unstyled">
+                        <?php foreach($comments as $comment): ?>
                         <li class="comment mb-4 pb-4 border-bottom">
                             <div class="comment-body">
                                 <div class="d-flex">
-                                    <img src="images/placeholder/80x80.jpg" class="avatar rounded-circle mr-3"
-                                        alt="Commenter" style="width: 60px; height: 60px; object-fit: cover;">
-
                                     <div class="flex-grow-1">
                                         <div class="comment-meta mb-2">
                                             <h6 class="mb-0">
-                                                <strong>Sinmun</strong>
-                                                <small class="text-muted ml-2">April 24, 2019 at 10:59 am</small>
+                                                <strong><?= htmlspecialchars($comment['user_name']) ?></strong>
+                                                <small class="text-muted ml-2">
+                                                    <?= date('M d, Y', strtotime($comment['created_at'])) ?>
+                                                </small>
                                             </h6>
                                         </div>
-
                                         <div class="comment-content mb-2">
-                                            <p class="mb-0">Lorem Ipsum has been the industry's standard dummy text ever
-                                                since the 1500s, when an unknown printer took a galley of type and
-                                                scrambled it to make a type specimen book.</p>
+                                            <p class="mb-0"><?= nl2br(htmlspecialchars($comment['comment'])) ?></p>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </li>
+                        <?php endforeach; ?>
                     </ol>
+                    <?php else: ?>
+                    <p class="text-muted">No comments yet. Be the first to comment!</p>
+                    <?php endif; ?>
 
 
                     <?php if (isset($_SESSION['LoggedIn']) && $_SESSION['LoggedIn'] !== false): ?>
